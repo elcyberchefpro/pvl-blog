@@ -12,9 +12,28 @@ permalink: /fotos/
     <h1 class="section-title reveal reveal-delay-1">
       El mundo a través<br>de <em>mis ojos</em>
     </h1>
-    <div style="margin-top:48px; padding:80px; text-align:center; border: 1px dashed #e0d8cc; border-radius:12px; color:#7a7068;">
-      <div style="font-size:3rem;margin-bottom:16px;">📸</div>
-      <p style="font-family:'DM Mono',monospace;font-size:0.85rem;">Agrega tus fotos en <code style="color:#c8460a;">src/assets/photos/</code> y crea entradas con <code style="color:#c8460a;">pvl nueva foto</code></p>
+
+    <div class="gallery-masonry" style="margin-top: 56px;">
+      {% for item in collections.foto %}
+      <a href="{{ item.url }}" class="gallery-item reveal reveal-delay-{{ loop.index % 3 + 1 }}">
+        {% if item.data.image %}
+          <img src="{{ item.data.image }}" alt="{{ item.data.title }}">
+        {% else %}
+          <img src="/assets/photos/{{ item.fileSlug }}/foto1.jpg" alt="{{ item.data.title }}">
+        {% endif %}
+        <div class="gallery-overlay">
+          <div class="gallery-caption">
+            <strong>{{ item.data.title }}</strong>
+            {% if item.data.location %}<br><span style="font-size:0.75rem; opacity:0.8;">📍 {{ item.data.location }}</span>{% endif %}
+          </div>
+        </div>
+      </a>
+      {% else %}
+      <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--muted); font-family: var(--font-mono); font-size: 0.85rem;">
+        📸 No hay fotografías cargadas aún. Usa tu script de terminal para registrar la primera.
+      </div>
+      {% endfor %}
     </div>
+
   </div>
 </div>

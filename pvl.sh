@@ -1,28 +1,27 @@
 #!/usr/bin/env bash
-# ═══════════════════════════════════════════════════════════
-#   PVL BLOG MANAGER — El Tigre Edition
-#   Menú interactivo para gestionar tu blog personal
+# ═══════════════════════════════════════════════════════════════
+#   🐅 PVL BLOG MANAGER — El Tigre Edition v3 (Premium)
+#   Gestión Avanzada: Blog, Historias, Fotos, Diario y CV
 #   Autor: Pavel Gomez | Cuernavaca, MX
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════
 
-# ─── COLORES ────────────────────────────────────────────────
+# ─── CONFIGURACIÓN DE RUTAS ───────────────────────────────────
+BLOG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CV_DIR="$HOME/Documents/cv-pavel-gomez"
+
+# ─── PALETA DE COLORES MATE & PREMIUM (Nord/Dracula Theme) ────
 RESET="\033[0m"
 BOLD="\033[1m"
-DIM="\033[2m"
-TIGER="\033[38;5;208m"       # Naranja tigre
-GOLD="\033[38;5;220m"        # Dorado
-GREEN="\033[38;5;82m"        # Verde terminal
-BLUE="\033[38;5;39m"         # Azul info
-RED="\033[38;5;196m"         # Rojo error
-MUTED="\033[38;5;244m"       # Gris apagado
-WHITE="\033[97m"
-BG_DARK="\033[48;5;235m"
+TIGER="\033[38;5;208m"       # Naranja atenuado
+GOLD="\033[38;5;178m"        # Dorado mate antiguo
+GREEN="\033[38;5;108m"       # Verde salvia mate
+BLUE="\033[38;5;67m"         # Azul acero lavado
+RED="\033[38;5;131m"         # Terracota / Rojo oscuro
+MUTED="\033[38;5;240m"       # Gris carbón oscuro
+WHITE="\033[38;5;250m"       # Blanco hueso
+CYAN="\033[38;5;72m"         # Verde azulado mate
 
-# ─── DIRECTORIO DEL PROYECTO ─────────────────────────────────
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BLOG_DIR="$SCRIPT_DIR"
-
-# ─── FUNCIONES DE UI ─────────────────────────────────────────
+# ─── UI HELPERS ───────────────────────────────────────────────
 clear_screen() { clear; }
 
 print_header() {
@@ -36,161 +35,126 @@ print_header() {
   echo "  ╚═╝       ╚═══╝  ╚══════╝    ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝ "
   echo -e "${RESET}"
   echo -e "  ${MUTED}──────────────────────────────────────────────────────────────────${RESET}"
-  echo -e "  ${GOLD}${BOLD}  Pavel Gomez — Blog Manager ${TIGER}\"El Tigre Edition\"${RESET}"
-  echo -e "  ${MUTED}  Cuernavaca, MX · pvl.gom3z@gmail.com${RESET}"
+  echo -e "  ${GOLD}${BOLD}  Pavel Gomez — Blog Manager ${TIGER}\"El Tigre Premium v3\"${RESET}"
+  echo -e "  ${MUTED}  Cuernavaca, MX · pvl.gom3z@gmail.com · https://pvl-blog.netlify.app/${RESET}"
   echo -e "  ${MUTED}──────────────────────────────────────────────────────────────────${RESET}"
+  _check_repo_status "$CV_DIR"   "📄 CV Actual "
+  _check_repo_status "$BLOG_DIR" "✍️  Blog Nuevo"
   echo ""
 }
 
-print_separator() {
-  echo -e "  ${MUTED}┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄${RESET}"
-}
-
-print_success() { echo -e "  ${GREEN}✓ ${WHITE}$1${RESET}"; }
-print_error()   { echo -e "  ${RED}✗ ${WHITE}$1${RESET}"; }
-print_info()    { echo -e "  ${BLUE}→ ${WHITE}$1${RESET}"; }
-print_warn()    { echo -e "  ${GOLD}⚠ ${WHITE}$1${RESET}"; }
-
-wait_key() {
-  echo ""
-  echo -e "  ${MUTED}[Presiona cualquier tecla para continuar...]${RESET}"
-  read -n1 -rs
-}
-
-# ─── GENERAR SLUG ─────────────────────────────────────────────
-make_slug() {
-  echo "$1" | tr '[:upper:]' '[:lower:]' | \
-    sed 's/[áàäâ]/a/g; s/[éèëê]/e/g; s/[íìïî]/i/g; s/[óòöô]/o/g; s/[úùüû]/u/g; s/ñ/n/g' | \
-    tr -cs '[:alnum:]' '-' | \
-    sed 's/^-//;s/-$//'
-}
-
-# ─── 1. NUEVA ENTRADA DE BLOG ─────────────────────────────────
-nueva_post() {
-  print_header
-  echo -e "  ${TIGER}${BOLD}✦ NUEVA ENTRADA DE BLOG${RESET}"
-  echo ""
-
-  echo -e "  ${WHITE}Título del artículo:${RESET} "
-  read -r titulo
-  [[ -z "$titulo" ]] && { print_error "Título vacío. Cancelando."; wait_key; return; }
-
-  echo -e "  ${WHITE}Categoría (Blog/Tech/Vida/Cocina) [Blog]:${RESET} "
-  read -r categoria
-  categoria="${categoria:-Blog}"
-
-  echo -e "  ${WHITE}Emoji representativo [📝]:${RESET} "
-  read -r emoji
-  emoji="${emoji:-📝}"
-
-  echo -e "  ${WHITE}Extracto corto (1-2 líneas):${RESET} "
-  read -r extracto
-
-  echo -e "  ${WHITE}¿Es el post destacado? (s/N):${RESET} "
-  read -r featured
-  featured_val="false"
-  [[ "${featured,,}" == "s" ]] && featured_val="true"
-
-  local fecha
-  fecha=$(date +%Y-%m-%d)
-  local slug
-  slug=$(make_slug "$titulo")
-  local filename="${fecha}-${slug}.md"
-  local filepath="${BLOG_DIR}/src/posts/${filename}"
-
-  cat > "$filepath" << FRONTMATTER
----
-layout: post.njk
-title: "${titulo}"
-date: ${fecha}
-category: "${categoria}"
-emoji: "${emoji}"
-excerpt: "${extracto}"
-featured: ${featured_val}
-tags:
-  - post
-  - ${categoria,,}
----
-
-<!-- Escribe aquí tu artículo en Markdown -->
-
-## Introducción
-
-Escribe tu introducción aquí...
-
-## Desarrollo
-
-Continúa tu artículo...
-
-## Conclusión
-
-Cierra con tus pensamientos finales.
-FRONTMATTER
-
-  echo ""
-  print_success "Post creado: ${GOLD}${filename}${RESET}"
-  echo ""
-
-  echo -e "  ${WHITE}¿Abrir en VS Code ahora? (S/n):${RESET} "
-  read -r abrir
-  if [[ "${abrir,,}" != "n" ]]; then
-    if command -v code &>/dev/null; then
-      code "$filepath"
-      print_success "Abierto en VS Code."
-    elif command -v xdg-open &>/dev/null; then
-      xdg-open "$filepath"
+_check_repo_status() {
+  local dir="$1"
+  local label="$2"
+  if [ -d "$dir/.git" ]; then
+    local branch dirty
+    branch=$(git -C "$dir" branch --show-current 2>/dev/null)
+    dirty=$(git -C "$dir" status --short 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$dirty" -gt 0 ]; then
+      echo -e "  ${GOLD}●${RESET} ${label}: ${MUTED}${dir/$HOME/\~}${RESET} ${GOLD}[${dirty} cambios pendientes]${RESET}"
     else
-      print_warn "VS Code no encontrado. Abre el archivo en: ${filepath}"
+      echo -e "  ${GREEN}●${RESET} ${label}: ${MUTED}${dir/$HOME/\~}${RESET} ${GREEN}[limpio · ${branch}]${RESET}"
     fi
+  else
+    echo -e "  ${RED}○${RESET} ${label}: ${MUTED}${dir/$HOME/\~} [no encontrado]${RESET}"
+  fi
+}
+
+print_sep()     { echo -e "  ${MUTED}──────────────────────────────────────────────────────────────────${RESET}"; }
+print_ok()      { echo -e "  ${GREEN}✓${RESET} $1"; }
+print_err()     { echo -e "  ${RED}✗ ERROR:${RESET} $1"; }
+print_info()    { echo -e "  ${BLUE}→${RESET} $1"; }
+print_warn()    { echo -e "  ${GOLD}⚠ ADVERTENCIA:${RESET} $1"; }
+wait_key()      { echo ""; echo -e "  ${MUTED}[Presiona cualquier tecla para continuar...]${RESET}"; read -rn1 -s; }
+
+make_slug() {
+  echo "$1" | tr '[:upper:]' '[:lower:]' \
+    | sed 's/[áàäâ]/a/g;s/[éèëê]/e/g;s/[íìïî]/i/g;s/[óòöô]/o/g;s/[úùüû]/u/g;s/ñ/n/g' \
+    | tr -cs '[:alnum:]' '-' | sed 's/^-//;s/-$//'
+}
+
+# ─── 1. NUEVA PUBLICACIÓN DIARIA (NUEVO SCRIPT) ───────────────
+nueva_diario() {
+  print_header
+  echo -e "  ${TIGER}${BOLD}✦ PUBLICACIÓN DIARIA DE TEXTO (RÁPIDA)${RESET}\n"
+  
+  echo -e "  ${WHITE}¿Qué estás pensando hoy, Tigre? (Escribe tu texto libre):${RESET}"
+  echo -ne "  ${MUTED}> ${RESET}"
+  read -r texto_diario
+  
+  if [[ -z "$texto_diario" ]]; then
+    print_err "Texto vacío. Cancelando diario."; wait_key; return
   fi
 
+  local fecha slug filename filepath
+  fecha=$(date +%Y-%m-%d)
+  # Creamos un título automático usando las primeras palabras
+  local titulo_corto
+  titulo_corto=$(echo "$texto_diario" | cut -d' ' -f1-4)
+  slug=$(make_slug "$titulo_corto")
+  filename="${fecha}-${slug}.md"
+  filepath="${BLOG_DIR}/src/diario/${filename}"
+  
+  mkdir -p "${BLOG_DIR}/src/diario"
+
+  cat > "$filepath" << FRONT
+---
+layout: post.njk
+title: "Bitácora: ${titulo_corto}..."
+date: ${fecha}
+category: "Diario"
+emoji: "☕"
+excerpt: "${texto_diario:0:60}..."
+tags:
+  - post
+  - diario
+---
+
+## Pensamiento del día (${fecha})
+
+${texto_diario}
+
+---
+*Escrito rápidamente desde la terminal de El Tigre Manager.*
+FRONT
+
   echo ""
-  echo -e "  ${MUTED}Ruta: ${filepath}${RESET}"
+  print_ok "Entrada de diario guardada en: ${GOLD}src/diario/${filename}${RESET}"
   wait_key
 }
 
-# ─── 2. NUEVA HISTORIA PERSONAL ────────────────────────────────
+# ─── 2. NUEVA ENTRADA DE HISTORIA ─────────────────────────────
 nueva_historia() {
   print_header
-  echo -e "  ${TIGER}${BOLD}✦ NUEVA HISTORIA PERSONAL${RESET}"
-  echo ""
+  echo -e "  ${TIGER}${BOLD}✦ NUEVA HISTORIA PERSONAL${RESET}\n"
 
-  echo -e "  ${WHITE}Título de la historia:${RESET} "
-  read -r titulo
-  [[ -z "$titulo" ]] && { print_error "Título vacío. Cancelando."; wait_key; return; }
+  echo -ne "  ${WHITE}Título de la historia: ${RESET}"; read -r titulo
+  [[ -z "$titulo" ]] && { print_err "Título vacío."; wait_key; return; }
 
-  echo -e "  ${WHITE}Lugar / Ubicación (ej: Utah, USA):${RESET} "
-  read -r lugar
+  echo -ne "  ${WHITE}Lugar del acontecimiento (ej: Utah, USA): ${RESET}"; read -r lugar
+  echo -ne "  ${WHITE}Año (ej: 2019): ${RESET}"; read -r anio
+  echo -ne "  ${WHITE}Extracto emotivo / Resumen: ${RESET}"; read -r extracto
 
-  echo -e "  ${WHITE}Extracto emotivo (1-2 líneas):${RESET} "
-  read -r extracto
-
-  echo -e "  ${WHITE}Año en que ocurrió (ej: 2019):${RESET} "
-  read -r anio
-
-  local fecha
+  local fecha slug filename filepath
   fecha=$(date +%Y-%m-%d)
-  local slug
   slug=$(make_slug "$titulo")
-  local filename="${fecha}-${slug}.md"
-  local filepath="${BLOG_DIR}/src/stories/${filename}"
-
+  filename="${fecha}-${slug}.md"
+  filepath="${BLOG_DIR}/src/stories/${filename}"
+  
   mkdir -p "${BLOG_DIR}/src/stories"
 
-  cat > "$filepath" << FRONTMATTER
+  cat > "$filepath" << FRONT
 ---
 layout: story.njk
 title: "${titulo}"
 date: ${fecha}
 location: "${lugar}"
-year: "${anio:-}"
+year: "${anio}"
 excerpt: "${extracto}"
 tags:
   - historia
   - personal
 ---
-
-<!-- Cuenta tu historia aquí -->
 
 *${lugar:-México}${anio:+ · $anio}*
 
@@ -198,50 +162,40 @@ tags:
 
 Comienza tu relato aquí...
 
-> Una cita que marcó ese momento.
+> Pon aquí una frase poderosa que resuma lo que viviste.
 
-Continúa la historia...
-FRONTMATTER
+Continúa escribiendo tu historia...
+FRONT
 
   echo ""
-  print_success "Historia creada: ${GOLD}${filename}${RESET}"
-  echo ""
-
-  echo -e "  ${WHITE}¿Abrir en VS Code? (S/n):${RESET} "
-  read -r abrir
-  if [[ "${abrir,,}" != "n" ]]; then
-    command -v code &>/dev/null && code "$filepath" || print_warn "Archivo en: ${filepath}"
-  fi
-
+  print_ok "Historia creada en: ${GOLD}src/stories/${filename}${RESET}"
+  echo -ne "\n  ${WHITE}¿Abrir en VS Code para detallarla? (S/n): ${RESET}"; read -r abrir
+  [[ "${abrir,,}" != "n" ]] && command -v code &>/dev/null && code "$filepath"
   wait_key
 }
 
-# ─── 3. NUEVA ENTRADA DE FOTOS ────────────────────────────────
+# ─── 3. FOTO CON TEXTO (GALERÍA MEJORADA) ─────────────────────
 nueva_foto() {
   print_header
-  echo -e "  ${TIGER}${BOLD}✦ NUEVA ENTRADA DE FOTOS${RESET}"
-  echo ""
+  echo -e "  ${TIGER}${BOLD}✦ NUEVA SESIÓN FOTOGRÁFICA + TEXTO${RESET}\n"
 
-  echo -e "  ${WHITE}Título / Nombre de la sesión:${RESET} "
-  read -r titulo
-  [[ -z "$titulo" ]] && { print_error "Vacío. Cancelando."; wait_key; return; }
+  echo -ne "  ${WHITE}Título del álbum / foto: ${RESET}"; read -r titulo
+  [[ -z "$titulo" ]] && { print_err "Vacío."; wait_key; return; }
 
-  echo -e "  ${WHITE}Descripción breve:${RESET} "
-  read -r desc
+  echo -ne "  ${WHITE}Descripción o historia detrás de la foto: ${RESET}"; read -r desc
+  echo -ne "  ${WHITE}Ubicación espacial: ${RESET}"; read -r lugar
 
-  echo -e "  ${WHITE}Ubicación de las fotos:${RESET} "
-  read -r lugar
-
-  local fecha
+  local fecha slug filename filepath assets_path
   fecha=$(date +%Y-%m-%d)
-  local slug
   slug=$(make_slug "$titulo")
-  local filename="${fecha}-${slug}.md"
+  filename="${fecha}-${slug}.md"
+  filepath="${BLOG_DIR}/src/photos/${filename}"
+  assets_path="${BLOG_DIR}/src/assets/photos/${slug}"
 
   mkdir -p "${BLOG_DIR}/src/photos"
-  mkdir -p "${BLOG_DIR}/src/assets/photos/${slug}"
+  mkdir -p "$assets_path"
 
-  cat > "${BLOG_DIR}/src/photos/${filename}" << FRONTMATTER
+  cat > "$filepath" << FRONT
 ---
 layout: base.njk
 title: "${titulo}"
@@ -252,271 +206,38 @@ tags:
   - foto
   - galeria
 ---
-<!-- Agrega tus imágenes en: src/assets/photos/${slug}/ -->
-<!-- Luego referencia con: /assets/photos/${slug}/nombre.jpg -->
-FRONTMATTER
 
-  print_success "Entrada de fotos creada: ${GOLD}${filename}${RESET}"
-  print_info  "Carpeta para imágenes: ${MUTED}src/assets/photos/${slug}/${RESET}"
+<div class="photo-entry text-center">
+  <p class="location-tag">📍 ${lugar}</p>
+  
+  <img src="/assets/photos/${slug}/foto1.jpg" alt="${titulo}" class="img-fluid custom-blog-img">
+  
+  <div class="photo-story mt-4">
+    <p>${desc}</p>
+  </div>
+</div>
+FRONT
+
+  echo ""
+  print_ok "Entrada de galería guardada."
+  print_info "Guarda tus fotos dentro de: ${GOLD}src/assets/photos/${slug}/${RESET}"
+  
+  # Truco: Abrir la carpeta de fotos automáticamente en el gestor de archivos de Linux
+  if command -v xdg-open &>/dev/null; then
+    echo -e "  ${BLUE}→ Abriendo carpeta de destino para que arrastres tus fotos...${RESET}"
+    xdg-open "$assets_path" &>/dev/null
+  fi
+
+  echo -ne "\n  ${WHITE}¿Abrir archivo de configuración en VS Code? (S/n): ${RESET}"; read -r abrir
+  [[ "${abrir,,}" != "n" ]] && command -v code &>/dev/null && code "$filepath"
   wait_key
 }
 
-# ─── 4. SERVIDOR LOCAL ────────────────────────────────────────
+# ─── SERVIDOR LOCAL ───────────────────────────────────────────
 servidor_local() {
   print_header
-  echo -e "  ${TIGER}${BOLD}✦ SERVIDOR LOCAL DE DESARROLLO${RESET}"
-  echo ""
-
+  echo -e "  ${TIGER}${BOLD}✦ PREVIEW EN VIVO (LOCAL)${RESET}\n"
   cd "$BLOG_DIR" || return
-
-  if ! command -v node &>/dev/null; then
-    print_error "Node.js no está instalado."
-    print_info  "Instálalo desde: https://nodejs.org"
-    wait_key; return
-  fi
-
-  if [ ! -d "node_modules" ]; then
-    print_info "Instalando dependencias por primera vez..."
-    npm install
-  fi
-
-  print_success "Iniciando servidor en ${GOLD}http://localhost:8080${RESET}"
-  print_info  "Ctrl+C para detener"
-  echo ""
-  npm run dev
-}
-
-# ─── 5. BUILD Y DEPLOY ────────────────────────────────────────
-build_y_deploy() {
-  print_header
-  echo -e "  ${TIGER}${BOLD}✦ BUILD & DEPLOY → NETLIFY${RESET}"
-  echo ""
-
-  cd "$BLOG_DIR" || return
-
-  # Git status
-  if ! git -C "$BLOG_DIR" rev-parse --git-dir &>/dev/null 2>&1; then
-    print_warn "Este directorio no es un repositorio Git."
-    echo -e "  ${WHITE}¿Inicializar repositorio Git ahora? (S/n):${RESET} "
-    read -r init
-    if [[ "${init,,}" != "n" ]]; then
-      git init
-      git add .
-      git commit -m "🐅 Initial commit — pvl-blog"
-      print_success "Repositorio Git inicializado."
-      echo ""
-      print_info "Sigue estos pasos para subir a GitHub:"
-      echo ""
-      echo -e "  ${GOLD}1.${RESET} Crea un repo en https://github.com/new"
-      echo -e "  ${GOLD}2.${RESET} Copia la URL y ejecuta:"
-      echo -e "     ${MUTED}git remote add origin https://github.com/TUUSUARIO/pvl-blog.git${RESET}"
-      echo -e "     ${MUTED}git push -u origin main${RESET}"
-      echo -e "  ${GOLD}3.${RESET} En Netlify → 'Add new site → Import from Git'"
-      echo -e "     ${MUTED}Build command:${RESET} ${GREEN}npm run build${RESET}"
-      echo -e "     ${MUTED}Publish dir:${RESET}   ${GREEN}_site${RESET}"
-    fi
-    wait_key; return
-  fi
-
-  print_info "Construyendo el sitio..."
-  npm run build
-
-  if [ $? -eq 0 ]; then
-    print_success "Build completado. Archivos en: ${GOLD}_site/${RESET}"
-  else
-    print_error "El build falló. Revisa los errores arriba."
-    wait_key; return
-  fi
-
-  echo ""
-  echo -e "  ${WHITE}¿Hacer commit y push automático? (S/n):${RESET} "
-  read -r dopush
-  if [[ "${dopush,,}" != "n" ]]; then
-    echo -e "  ${WHITE}Mensaje del commit [actualizar blog]:${RESET} "
-    read -r msg
-    msg="${msg:-actualizar blog}"
-    git add .
-    git commit -m "🐅 ${msg}"
-    git push
-    echo ""
-    print_success "Push enviado. Netlify desplegará en ~30 segundos."
-    print_info  "Monitorea en: ${GOLD}https://app.netlify.com${RESET}"
-  fi
-
-  wait_key
-}
-
-# ─── 6. VER POSTS EXISTENTES ──────────────────────────────────
-ver_posts() {
-  print_header
-  echo -e "  ${TIGER}${BOLD}✦ ENTRADAS EXISTENTES${RESET}"
-  echo ""
-
-  local count=0
-
-  echo -e "  ${GOLD}── BLOG POSTS ──────────────────────────────${RESET}"
-  if compgen -G "${BLOG_DIR}/src/posts/*.md" > /dev/null 2>&1; then
-    for f in "${BLOG_DIR}/src/posts/"*.md; do
-      local nombre
-      nombre=$(basename "$f")
-      echo -e "  ${GREEN}•${RESET} ${nombre}"
-      ((count++))
-    done
-  else
-    echo -e "  ${MUTED}  (ninguno aún)${RESET}"
-  fi
-
-  echo ""
-  echo -e "  ${GOLD}── HISTORIAS ────────────────────────────────${RESET}"
-  if compgen -G "${BLOG_DIR}/src/stories/*.md" > /dev/null 2>&1; then
-    for f in "${BLOG_DIR}/src/stories/"*.md; do
-      echo -e "  ${GREEN}•${RESET} $(basename "$f")"
-      ((count++))
-    done
-  else
-    echo -e "  ${MUTED}  (ninguna aún)${RESET}"
-  fi
-
-  echo ""
-  echo -e "  ${MUTED}Total: ${count} archivos${RESET}"
-
-  echo ""
-  echo -e "  ${WHITE}¿Abrir un archivo en VS Code? Escribe el nombre (o Enter para cancelar):${RESET} "
-  read -r archivo
-  if [[ -n "$archivo" ]]; then
-    local found
-    found=$(find "$BLOG_DIR/src" -name "$archivo" 2>/dev/null | head -1)
-    if [[ -n "$found" ]]; then
-      code "$found" 2>/dev/null || print_warn "Abre manualmente: $found"
-    else
-      print_error "Archivo no encontrado: $archivo"
-    fi
-  fi
-
-  wait_key
-}
-
-# ─── 7. EDITAR CURRICULUM ────────────────────────────────────
-editar_curriculum() {
-  print_header
-  echo -e "  ${TIGER}${BOLD}✦ EDITAR CURRÍCULUM${RESET}"
-  echo ""
-  local cv="${BLOG_DIR}/src/curriculum.njk"
-  print_info "Abriendo: ${GOLD}src/curriculum.njk${RESET}"
-  echo ""
-  echo -e "  ${MUTED}Edita el archivo en VS Code y guarda.${RESET}"
-  echo -e "  ${MUTED}El servidor local actualizará automáticamente.${RESET}"
-  command -v code &>/dev/null && code "$cv" || print_warn "Abre manualmente: $cv"
-  wait_key
-}
-
-# ─── 8. ESTADO DEL SITIO ─────────────────────────────────────
-estado_sitio() {
-  print_header
-  echo -e "  ${TIGER}${BOLD}✦ ESTADO DEL SITIO${RESET}"
-  echo ""
-
-  # Git status
-  if git -C "$BLOG_DIR" rev-parse --git-dir &>/dev/null 2>&1; then
-    local branch
-    branch=$(git -C "$BLOG_DIR" branch --show-current 2>/dev/null)
-    local commits
-    commits=$(git -C "$BLOG_DIR" rev-list --count HEAD 2>/dev/null)
-    print_success "Git: rama ${GOLD}${branch}${RESET} · ${commits} commits"
-
-    local unpushed
-    unpushed=$(git -C "$BLOG_DIR" status --short 2>/dev/null | wc -l | tr -d ' ')
-    if [[ "$unpushed" -gt 0 ]]; then
-      print_warn "${unpushed} cambios sin commit"
-    else
-      print_success "Todo sincronizado"
-    fi
-  else
-    print_warn "Sin repositorio Git"
-  fi
-
-  echo ""
-
-  # Conteo de contenido
-  local posts stories photos
-  posts=$(find "${BLOG_DIR}/src/posts" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-  stories=$(find "${BLOG_DIR}/src/stories" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-  photos=$(find "${BLOG_DIR}/src/photos" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-
-  echo -e "  ${GOLD}── CONTENIDO ────────────────────────${RESET}"
-  echo -e "  ${GREEN}•${RESET} Blog posts:  ${WHITE}${posts}${RESET}"
-  echo -e "  ${GREEN}•${RESET} Historias:   ${WHITE}${stories}${RESET}"
-  echo -e "  ${GREEN}•${RESET} Fotos:       ${WHITE}${photos}${RESET}"
-
-  echo ""
-  echo -e "  ${GOLD}── ENLACES ──────────────────────────${RESET}"
-  echo -e "  ${GREEN}•${RESET} Local:    ${BLUE}http://localhost:8080${RESET}"
-  echo -e "  ${GREEN}•${RESET} Online:   ${BLUE}https://pvlcv.netlify.app${RESET}"
-  echo -e "  ${GREEN}•${RESET} LinkedIn: ${BLUE}linkedin.com/in/pavelgomez1509${RESET}"
-
-  wait_key
-}
-
-# ─── MENÚ PRINCIPAL ───────────────────────────────────────────
-main_menu() {
-  while true; do
-    print_header
-
-    echo -e "  ${GOLD}${BOLD}¿Qué deseas hacer hoy, El Tigre?${RESET}"
-    echo ""
-    echo -e "  ${TIGER}[1]${RESET}  ✍️  Nueva entrada de blog"
-    echo -e "  ${TIGER}[2]${RESET}  📖  Nueva historia personal"
-    echo -e "  ${TIGER}[3]${RESET}  📸  Nueva entrada de fotos"
-    print_separator
-    echo -e "  ${TIGER}[4]${RESET}  🖥️  Ver posts existentes & editar"
-    echo -e "  ${TIGER}[5]${RESET}  👤  Editar Currículum"
-    print_separator
-    echo -e "  ${TIGER}[6]${RESET}  🚀  Servidor local (preview)"
-    echo -e "  ${TIGER}[7]${RESET}  📡  Build & Deploy → Netlify"
-    echo -e "  ${TIGER}[8]${RESET}  📊  Estado del sitio"
-    print_separator
-    echo -e "  ${MUTED}[0]${RESET}  Salir"
-    echo ""
-    echo -ne "  ${WHITE}Opción:${RESET} ${TIGER}"
-    read -r opcion
-    echo -e "${RESET}"
-
-    case "$opcion" in
-      1) nueva_post ;;
-      2) nueva_historia ;;
-      3) nueva_foto ;;
-      4) ver_posts ;;
-      5) editar_curriculum ;;
-      6) servidor_local ;;
-      7) build_y_deploy ;;
-      8) estado_sitio ;;
-      0)
-        clear_screen
-        echo -e "\n  ${TIGER}${BOLD}🐅 El Tigre descansa... hasta la próxima.${RESET}\n"
-        exit 0
-        ;;
-      *)
-        print_error "Opción inválida."
-        sleep 1
-        ;;
-    esac
-  done
-}
-
-# ─── SOPORTE DE ARGUMENTOS DIRECTOS ──────────────────────────
-# Uso: ./pvl.sh nueva post | ./pvl.sh nueva historia | ./pvl.sh deploy
-case "${1:-}" in
-  "nueva")
-    case "${2:-}" in
-      "post"|"blog") nueva_post; exit 0 ;;
-      "historia"|"story") nueva_historia; exit 0 ;;
-      "foto"|"photo") nueva_foto; exit 0 ;;
-    esac
-    ;;
-  "deploy") build_y_deploy; exit 0 ;;
-  "server"|"dev") servidor_local; exit 0 ;;
-  "status") estado_sitio; exit 0 ;;
-esac
-
-# ─── INICIAR MENÚ ─────────────────────────────────────────────
-main_menu
+  [ ! -d "node_modules" ] && npm install
+  print_ok "Servidor encendido en ${GOLD}http://localhost:8080${RESET}"
+  print_info "Presiona Ctrl+C para apagar el

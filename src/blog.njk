@@ -13,7 +13,7 @@ permalink: /blog/
       Notas desde<br>la <em>trinchera</em>
     </h1>
     <div class="post-grid" style="margin-top:56px;">
-      {% for post in collections.posts %}
+      {% for post in collections.post %}
       <a href="{{ post.url }}" class="post-card reveal reveal-delay-{{ loop.index % 3 + 1 }}">
         <div class="post-card-img-placeholder">{{ post.data.emoji or "📝" }}</div>
         <div class="post-card-body">

@@ -1,0 +1,39 @@
+---
+layout: base.njk
+---
+<article class="photo-entry-wrapper">
+  
+  <div class="photo-meta-bar">
+    <span>{{ page.date | dateFormat }}</span>
+    {% if location %}
+    <span class="photo-location">📍 {{ location }}</span>
+    {% endif %}
+  </div>
+
+  <div class="photo-container">
+    {% if image %}
+      <img src="{{ image }}" alt="{{ title }}">
+    {% else %}
+      <img src="/assets/photos/{{ page.fileSlug }}/foto1.jpg" alt="{{ title }}">
+    {% endif %}
+  </div>
+
+  <h1 class="section-title" style="margin-top: 40px; font-size: clamp(2rem, 4vw, 3rem); text-align: left;">
+    {{ title }}
+  </h1>
+
+  <div class="photo-text-essay">
+    {% if description %}
+      <p>{{ description }}</p>
+    {% endif %}
+    
+    <div style="margin-top: 24px;">
+      {{ content | safe }}
+    </div>
+  </div>
+
+</article>
+
+<div style="max-width: 850px; margin: 0 auto 120px; padding: 0 24px;">
+  <a href="/fotos/" class="btn btn-ghost" style="color: var(--ink); border-color: var(--muted);">← Volver a la Galería</a>
+</div>

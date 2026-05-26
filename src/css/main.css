@@ -983,3 +983,85 @@ a { color: inherit; text-decoration: none; }
   .article-body { padding: 0 24px; }
   .cv-main { padding: 60px 24px; }
 }
+/* ─── ENTRADAS DE FOTOS CON TEXTO EDITORIAL (MEJORA TIGRE) ─── */
+.photo-entry-wrapper {
+  max-width: 850px;
+  margin: 64px auto;
+  padding: 0 24px;
+}
+
+.photo-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--smoke);
+  background-color: var(--cream);
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+}
+
+.photo-container:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.photo-container img {
+  width: 100%;
+  height: auto;
+  max-height: 700px;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-meta-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--smoke);
+}
+
+.photo-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--tiger);
+  font-weight: 500;
+}
+
+.photo-text-essay {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  line-height: 1.85;
+  color: var(--slate);
+  margin-top: 36px;
+  text-align: justify;
+}
+
+.photo-text-essay p::first-letter {
+  font-family: var(--font-sans);
+  font-size: 3.2rem;
+  font-weight: 800;
+  float: left;
+  line-height: 0.85;
+  margin-right: 12px;
+  margin-top: 4px;
+  color: var(--tiger);
+}
+
+/* Etiqueta especial mate para las entradas de diario rápido */
+.post-card-tag.tag-diario {
+  background: var(--cream);
+  color: var(--slate);
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+
