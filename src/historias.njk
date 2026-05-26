@@ -1,0 +1,29 @@
+---
+layout: base.njk
+title: Historias
+permalink: /historias/
+---
+<div style="padding-top:120px;">
+  <div class="section">
+    <div class="section-label reveal">
+      <div class="section-label-line"></div>
+      <span>Historias personales</span>
+    </div>
+    <h1 class="section-title reveal reveal-delay-1">
+      Lo que <em>viví</em><br>para contarlo
+    </h1>
+    <div class="stories-timeline" style="margin-top:56px; max-width:800px;">
+      {% for story in collections.stories %}
+      <a href="{{ story.url }}" class="story-item reveal" style="display:block;">
+        <div class="story-date">{{ story.date | dateFormat }} {% if story.data.location %}· {{ story.data.location }}{% endif %}</div>
+        <h2 class="story-title">{{ story.data.title }}</h2>
+        <p class="story-excerpt">{{ story.data.excerpt }}</p>
+      </a>
+      {% else %}
+      <div style="color:#7a7068; font-family:'DM Mono',monospace; font-size:0.85rem; padding:40px 0;">
+        Tus historias personales aparecerán aquí. Usa <code style="color:#c8460a;">pvl nueva historia</code> para comenzar.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

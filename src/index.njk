@@ -1,0 +1,196 @@
+---
+layout: base.njk
+title: Inicio
+bodyClass: home
+---
+
+<!-- ═══════════════════════════════════════════
+     HERO — PORTADA ESPECTACULAR
+     ═══════════════════════════════════════════ -->
+<section class="hero" id="hero">
+
+  <!-- Capas parallax con movimiento al mouse -->
+  <div class="hero-layer hero-bg" data-parallax="0.1"></div>
+  <div class="hero-layer hero-grain" data-parallax="0.05"></div>
+  <div class="hero-layer hero-stripes" data-parallax="0.15"></div>
+
+  <!-- Franjas animadas estilo piel de tigre -->
+  <div class="hero-stripe" style="top:18%; left:0; width:55%; height:2px; --dur:9s; --delay:0s;"></div>
+  <div class="hero-stripe" style="top:32%; left:30%; width:40%; height:1px; --dur:7s; --delay:1s;"></div>
+  <div class="hero-stripe" style="top:55%; left:10%; width:70%; height:2px; --dur:11s; --delay:0.5s;"></div>
+  <div class="hero-stripe" style="top:72%; left:0; width:45%; height:1px; --dur:8s; --delay:2s;"></div>
+  <div class="hero-stripe" style="top:85%; left:20%; width:60%; height:2px; --dur:10s; --delay:0.3s;"></div>
+
+  <!-- Número decorativo gigante de fondo -->
+  <div class="hero-number" aria-hidden="true">X</div>
+
+  <!-- Contenido principal -->
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-line"></div>
+      <span>Cuernavaca, Morelos · Desde Utah al mundo</span>
+    </div>
+
+    <h1 class="hero-title">
+      Pavel<br>
+      <em>Gomez</em>
+    </h1>
+
+    <p class="hero-subtitle">
+      Informático · Operador de Cocinas · Narrador de Vida
+    </p>
+
+    <div class="hero-ctas">
+      <a href="/blog/" class="btn btn-primary">Leer el Blog</a>
+      <a href="/historias/" class="btn btn-ghost">Mis Historias</a>
+    </div>
+  </div>
+
+  <!-- Indicador de scroll -->
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     ÚLTIMAS ENTRADAS DEL BLOG
+     ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label reveal">
+    <div class="section-label-line"></div>
+    <span>Últimas entradas</span>
+  </div>
+
+  <h2 class="section-title reveal reveal-delay-1">
+    Desde el <em>campo</em><br>y la pantalla
+  </h2>
+
+  <!-- Post destacado -->
+  {% set featuredPost = collections.posts | first %}
+  {% if featuredPost %}
+  <a href="{{ featuredPost.url }}" class="post-featured reveal mt-48">
+    <div class="post-featured-img">
+      {% if featuredPost.data.image %}
+        <img src="{{ featuredPost.data.image }}" alt="{{ featuredPost.data.title }}" loading="lazy">
+      {% else %}
+        <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1510,#2a1f15);display:flex;align-items:center;justify-content:center;font-size:5rem;">🐅</div>
+      {% endif %}
+    </div>
+    <div class="post-featured-body">
+      <div class="post-featured-tag">✦ Destacado · {{ featuredPost.data.category or "Blog" }}</div>
+      <h3 class="post-featured-title">{{ featuredPost.data.title }}</h3>
+      <p class="post-featured-excerpt">{{ featuredPost.data.excerpt or featuredPost.data.description }}</p>
+      <div class="btn btn-primary" style="display:inline-flex;">Leer artículo →</div>
+    </div>
+  </a>
+  {% endif %}
+
+  <!-- Grid de posts restantes -->
+  <div class="post-grid">
+    {% for post in collections.posts | slice(1, 4) %}
+    <a href="{{ post.url }}" class="post-card reveal reveal-delay-{{ loop.index }}">
+      <div class="post-card-img-placeholder">
+        {{ post.data.emoji or "📝" }}
+      </div>
+      <div class="post-card-body">
+        <span class="post-card-tag">{{ post.data.category or "Blog" }}</span>
+        <h3 class="post-card-title">{{ post.data.title }}</h3>
+        <p class="post-card-excerpt">{{ post.data.excerpt }}</p>
+        <div class="post-card-meta">
+          <span>{{ post.date | dateFormat }}</span>
+          <span class="post-card-read">Leer →</span>
+        </div>
+      </div>
+    </a>
+    {% else %}
+    <div class="post-card reveal" style="background:#fff; padding:40px; text-align:center; color:#7a7068; font-family:'DM Mono',monospace; font-size:0.8rem; border: 1px dashed #e0d8cc;">
+      <div style="font-size:2.5rem; margin-bottom:16px;">✍️</div>
+      <p>Aquí aparecerán tus primeras entradas del blog.</p>
+      <p style="margin-top:8px; color:#c8460a;">Usa el script <code>pvl</code> para crear una.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="text-center mt-48 reveal">
+    <a href="/blog/" class="btn btn-primary">Ver todas las entradas →</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECCIÓN — QUIEN SOY
+     ═══════════════════════════════════════════ -->
+<div class="section-full">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;">
+      <div>
+        <div class="section-label reveal">
+          <div class="section-label-line"></div>
+          <span>Sobre mí</span>
+        </div>
+        <h2 class="section-title reveal mt-16">
+          El <em>Tigre</em><br>de Cuernavaca
+        </h2>
+        <p class="reveal mt-32" style="font-family:'Cormorant Garamond','Playfair Display',serif; font-size:1.15rem; line-height:1.8; color:#3a3530;">
+          Informático de profesión, formado en las cocinas de Utah y templado 
+          en el mercado norteamericano. Liderazgo que no grita, tecnología que 
+          resuelve. Esto es lo que escribo desde aquí.
+        </p>
+        <div class="mt-32 reveal">
+          <a href="/curriculum/" class="btn btn-primary">Ver Currículum completo</a>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-2">
+        <div style="background:#0f0d0a; border-radius:12px; padding:40px; font-family:'DM Mono',monospace; font-size:0.8rem; line-height:1.8; color:#c8460a;">
+          <span style="color:#7a7068;">$ whoami</span><br>
+          pavel-gomez <span style="color:#faf7f2;">"El Tigre"</span><br><br>
+          <span style="color:#7a7068;">$ skills --top</span><br>
+          <span style="color:#c9952a;">[✓]</span> Operaciones restauranteras 360°<br>
+          <span style="color:#c9952a;">[✓]</span> Linux, servidores, redes<br>
+          <span style="color:#c9952a;">[✓]</span> IA local (Ollama, Mistral, Phi-4)<br>
+          <span style="color:#c9952a;">[✓]</span> Marketing digital & POS (Toast/Square)<br>
+          <span style="color:#c9952a;">[✓]</span> Inglés C1-C2 operativo<br><br>
+          <span style="color:#7a7068;">$ status</span><br>
+          <span style="color:#27c93f;">OPERACIONAL</span> · Cuernavaca, MX<br>
+          <span style="color:#faf7f2; animation: blink 1s step-end infinite;">█</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECCIÓN — HISTORIAS
+     ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label reveal">
+    <div class="section-label-line"></div>
+    <span>Historias personales</span>
+  </div>
+  <h2 class="section-title reveal reveal-delay-1">
+    La vida vivida,<br>no <em>resumida</em>
+  </h2>
+
+  <div class="stories-timeline">
+    {% for story in collections.stories | slice(0, 3) %}
+    <a href="{{ story.url }}" class="story-item reveal" style="display:block;">
+      <div class="story-date">{{ story.date | dateFormat }}</div>
+      <h3 class="story-title">{{ story.data.title }}</h3>
+      <p class="story-excerpt">{{ story.data.excerpt }}</p>
+    </a>
+    {% else %}
+    <div class="story-item reveal" style="color:#7a7068; font-family:'DM Mono',monospace; font-size:0.85rem;">
+      Las historias aparecerán aquí. Usa <code style="color:#c8460a;">pvl nueva historia</code> para comenzar.
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="mt-48 reveal">
+    <a href="/historias/" class="btn btn-primary">Todas las historias →</a>
+  </div>
+</div>
+
+<style>
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+</style>

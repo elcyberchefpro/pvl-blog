@@ -1,0 +1,37 @@
+---
+layout: base.njk
+title: Blog
+permalink: /blog/
+---
+<div style="padding-top:120px;">
+  <div class="section">
+    <div class="section-label reveal">
+      <div class="section-label-line"></div>
+      <span>Blog</span>
+    </div>
+    <h1 class="section-title reveal reveal-delay-1">
+      Notas desde<br>la <em>trinchera</em>
+    </h1>
+    <div class="post-grid" style="margin-top:56px;">
+      {% for post in collections.posts %}
+      <a href="{{ post.url }}" class="post-card reveal reveal-delay-{{ loop.index % 3 + 1 }}">
+        <div class="post-card-img-placeholder">{{ post.data.emoji or "📝" }}</div>
+        <div class="post-card-body">
+          <span class="post-card-tag">{{ post.data.category or "Blog" }}</span>
+          <h2 class="post-card-title">{{ post.data.title }}</h2>
+          <p class="post-card-excerpt">{{ post.data.excerpt }}</p>
+          <div class="post-card-meta">
+            <span>{{ post.date | dateFormat }}</span>
+            <span class="post-card-read">Leer →</span>
+          </div>
+        </div>
+      </a>
+      {% else %}
+      <div style="grid-column:1/-1; text-align:center; padding:80px; color:#7a7068; font-family:'DM Mono',monospace; font-size:0.85rem;">
+        <div style="font-size:3rem;margin-bottom:16px;">✍️</div>
+        <p>Aún no hay entradas. Usa <code style="color:#c8460a;">pvl nueva post</code> para crear la primera.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

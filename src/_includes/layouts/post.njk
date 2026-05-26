@@ -1,0 +1,25 @@
+---
+layout: base.njk
+---
+<article>
+  <div class="article-hero">
+    <div class="article-tag">{{ category or "Blog" }}</div>
+    <h1 class="article-title">{{ title }}</h1>
+    <div class="article-meta">
+      <span>{{ page.date | dateFormat }}</span>
+      <span>Pavel Gomez</span>
+      {% if tags %}<span>{{ tags | join(", ") }}</span>{% endif %}
+    </div>
+  </div>
+  {% if image %}
+  <div style="max-width:900px;margin:0 auto;padding:0 60px;">
+    <img src="{{ image }}" alt="{{ title }}" style="width:100%;border-radius:8px;aspect-ratio:16/9;object-fit:cover;">
+  </div>
+  {% endif %}
+  <div class="article-body">
+    {{ content | safe }}
+  </div>
+</article>
+<div style="max-width:720px;margin:0 auto 80px;padding:0 60px;">
+  <a href="/blog/" class="btn btn-primary">← Volver al Blog</a>
+</div>

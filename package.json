@@ -1,0 +1,13 @@
+{
+  "name": "pvl-blog",
+  "version": "1.0.0",
+  "description": "Pavel Gomez - Personal Blog & Portfolio",
+  "scripts": {
+    "start": "npx @11ty/eleventy --serve --port 8080",
+    "build": "npx @11ty/eleventy",
+    "dev": "npx @11ty/eleventy --serve --watch"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.1"
+  }
+}

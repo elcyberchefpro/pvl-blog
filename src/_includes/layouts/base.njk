@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }} | Pavel Gomez — El Tigre</title>
+  <meta name="description" content="{{ description or 'Blog personal de Pavel Gomez — Informático, Líder de Operaciones, Narrador de vida.' }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;800&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&display=swap">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body class="{{ bodyClass or '' }}">
+  {% include "partials/nav.njk" %}
+  <main>
+    {{ content | safe }}
+  </main>
+  {% include "partials/footer.njk" %}
+  <script src="/js/main.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

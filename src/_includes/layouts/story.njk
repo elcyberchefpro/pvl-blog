@@ -1,0 +1,19 @@
+---
+layout: base.njk
+---
+<article>
+  <div class="article-hero">
+    <div class="article-tag" style="color:var(--gold);">Historia Personal</div>
+    <h1 class="article-title">{{ title }}</h1>
+    <div class="article-meta">
+      <span>{{ page.date | dateFormat }}</span>
+      <span>{{ location or "México / Utah" }}</span>
+    </div>
+  </div>
+  <div class="article-body" style="font-size:1.2rem; line-height:1.9;">
+    {{ content | safe }}
+  </div>
+</article>
+<div style="max-width:720px;margin:0 auto 80px;padding:0 60px;">
+  <a href="/historias/" class="btn btn-primary">← Todas las historias</a>
+</div>
